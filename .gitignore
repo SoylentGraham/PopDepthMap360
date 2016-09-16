@@ -1,0 +1,16 @@
+Assets/StreamingAssets/
+
+
+# Unity
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+
+*.csproj
+*.sln
+*.userprefs
+*.apk
+
+# OSX
+.DS_Store
+*.suo
