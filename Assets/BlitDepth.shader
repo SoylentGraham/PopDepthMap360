@@ -1,7 +1,7 @@
 ﻿Shader "NewChromantics/DepthBlit" {
    Properties
      {
-         DepthMax ("DepthMax", Range(0,0.3)) = 0.1
+         DepthMax ("DepthMax", Range(0,100)) = 0.1
      }
      SubShader {
 Tags { "RenderType"="Opaque" }
@@ -32,11 +32,23 @@ v2f vert (appdata_base v){
    return o;
 }
 
+float GetDepth(v2f i)
+{
+	/*
+	float Depth = UNITY_SAMPLE_DEPTH(tex2D (_CameraDepthTexture, i.scrPos));
+	//float Depth = UNITY_SAMPLE_DEPTH(tex2D (_CameraDepthTexture, i.scrPos));
+	//Depth = LinearEyeDepth (Depth);
+	return Depth;
+	*/
+	float Depth = Linear01Depth (tex2Dproj(_CameraDepthTexture, UNITY_PROJ_COORD(i.scrPos)).r);
+	return Depth;
+}
+
 //Fragment Shader
 half4 frag (v2f i) : COLOR{
 
-  	float depthValue = Linear01Depth (tex2Dproj(_CameraDepthTexture, UNITY_PROJ_COORD(i.scrPos)).r);
-  	float DepthNorm = depthValue / DepthMax;
+	float Depth = GetDepth(i);
+  	float DepthNorm = Depth / DepthMax;
 
   	DepthNorm = clamp( 0, 1, DepthNorm );
   	DepthNorm = 1 - DepthNorm;

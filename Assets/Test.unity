@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.4469247, g: 0.49678522, b: 0.5750836, a: 1}
+  m_IndirectSpecularColor: {r: 0.44692492, g: 0.4967869, b: 0.57508546, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -121,7 +121,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 83349f8817eae417f97253469639099d, type: 2}
+  - {fileID: 2100000, guid: 7f356079ddd7ec343b9fd9588d01d85a, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_ProbeAnchor: {fileID: 0}
@@ -419,11 +419,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SourceCamera: {fileID: 1064858057}
-  EquirectDepth: {fileID: 8400000, guid: 0b08b9a18354448bc8e02551f3899604, type: 2}
-  EquirectColour: {fileID: 8400000, guid: 9b5afe85a3b0b46dfaa4c47666ebdd39, type: 2}
-  DepthCubemap: {fileID: 8900000, guid: 3b13ae76c605b4b7cbb870484698480c, type: 2}
+  DepthEquirect: {fileID: 8400000, guid: 0b08b9a18354448bc8e02551f3899604, type: 2}
   DepthShader: {fileID: 4800000, guid: 9d63f46b5387b4f9f866634d7fc6c40c, type: 3}
   BlitDepth: {fileID: 2100000, guid: 2535ef9eea8c84f13a6c640c66d2842b, type: 2}
+  BlitEquirect: {fileID: 2100000, guid: 75e500349ac3e0f4596d40b3af25f98f, type: 2}
+  DepthLeft: {fileID: 8400000, guid: 59dd125bc99dec44495b5a3c3adc1a06, type: 2}
+  DepthRight: {fileID: 8400000, guid: 7cbbd765ee1b52a4a8843c35984359ee, type: 2}
+  DepthForward: {fileID: 8400000, guid: f068e1dbaf0818745994401c4d097742, type: 2}
+  DepthBackward: {fileID: 8400000, guid: f91be37848b71f94c9e27afea69c5e60, type: 2}
+  DepthUp: {fileID: 8400000, guid: 3359b6c61df12234daf5d942d93be11e, type: 2}
+  DepthDown: {fileID: 8400000, guid: 32c0a7dc024df97438b612192900845c, type: 2}
+  BlitDepthMax: 521
+  BlitDepthMaxUniform: DepthMax
+  TempColour: {fileID: 8400000, guid: 9b5afe85a3b0b46dfaa4c47666ebdd39, type: 2}
+  BlitDepthAfterEvent: 1
+  Dirty: 1
 --- !u!4 &1025232109
 Transform:
   m_ObjectHideFlags: 0
@@ -518,7 +528,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1064858056}
   m_LocalRotation: {x: -0.06324542, y: -0.026346963, z: 0.0016702131, w: -0.9976488}
-  m_LocalPosition: {x: -0.0006389022, y: 3.0589979, z: -8.73661}
+  m_LocalPosition: {x: -0.0006389022, y: 3.0589979, z: -1.34}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []

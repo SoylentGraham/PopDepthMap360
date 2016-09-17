@@ -18,5 +18,5 @@ Material:
     m_Floats:
     - first:
         name: DepthMax
-      second: 0.021
+      second: 1
     m_Colors: []
