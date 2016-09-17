@@ -37,9 +37,8 @@ public class PopDepthCapture360 : MonoBehaviour {
 
 	void Update ()
 	{
-		
-		//if ( !Dirty )
-		//	return;
+		if ( !Dirty )
+			return;
 
 		if ( TempColour == null )
 			TempColour = new RenderTexture(1,1,24);
@@ -66,12 +65,12 @@ public class PopDepthCapture360 : MonoBehaviour {
 		Destroy (TempCameraObject);
 
 		//	make equirect
-		BlitEquirect.SetTexture("DepthLeft", DepthLeft);
-		BlitEquirect.SetTexture("DepthRight", DepthRight);
-		BlitEquirect.SetTexture("DepthForward", DepthForward);
-		BlitEquirect.SetTexture("DepthBackward", DepthBackward);
-		BlitEquirect.SetTexture("DepthUp", DepthUp);
-		BlitEquirect.SetTexture("DepthDown", DepthDown);
+		BlitEquirect.SetTexture("CubemapLeft", DepthLeft);
+		BlitEquirect.SetTexture("CubemapRight", DepthRight);
+		BlitEquirect.SetTexture("CubemapFront", DepthForward);
+		BlitEquirect.SetTexture("CubemapBack", DepthBackward);
+		BlitEquirect.SetTexture("CubemapTop", DepthUp);
+		BlitEquirect.SetTexture("CubemapBottom", DepthDown);
 
 		Graphics.Blit( null, DepthEquirect, BlitEquirect );
 
