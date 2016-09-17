@@ -1,0 +1,3 @@
+[submodule "Assets/PopUnityCommon"]
+	path = Assets/PopUnityCommon
+	url = https://github.com/SoylentGraham/PopUnityCommon.git
