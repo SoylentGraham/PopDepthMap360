@@ -49,16 +49,47 @@ public class PopDepthCapture360 : MonoBehaviour {
 		if ( !Dirty )
 			return;
 
+		bool MakeDepth = ( DepthEquirect != null );
+		bool MakeColour = ( ColourEquirect != null );
+
+		//	gr: this affects depth capture
+		int TempWidth = Mathf.Max( ColourEquirect ? ColourEquirect.width : 1, DepthEquirect ? DepthEquirect.width : 1 );
+		int TempHeight = Mathf.Max( ColourEquirect ? ColourEquirect.height : 1, DepthEquirect ? DepthEquirect.height : 1 );
+		int TempDepth = 24;
+
 		if ( TempColour == null )
-			TempColour = new RenderTexture(1,1,24);
+			TempColour = new RenderTexture(TempWidth,TempHeight,TempDepth);
 		
-		if (ColourLeft ==null)		ColourLeft = TempColour;
-		if (ColourRight ==null)		ColourRight = TempColour;
-		if (ColourForward ==null)	ColourForward = TempColour;
-		if (ColourBackward ==null)	ColourBackward = TempColour;
-		if (ColourUp ==null)		ColourUp = TempColour;
-		if (ColourDown ==null)		ColourDown = TempColour;
-		
+		if (MakeColour)
+		{
+			
+			if ( ColourLeft == null )		ColourLeft = new RenderTexture( TempWidth, TempHeight, TempDepth );
+			if ( ColourRight == null )		ColourRight = new RenderTexture( TempWidth, TempHeight, TempDepth );
+			if ( ColourForward == null )	ColourForward = new RenderTexture( TempWidth, TempHeight, TempDepth );
+			if ( ColourBackward == null )	ColourBackward = new RenderTexture( TempWidth, TempHeight, TempDepth );
+			if ( ColourUp == null )			ColourUp = new RenderTexture( TempWidth, TempHeight, TempDepth );
+			if ( ColourDown == null )		ColourDown = new RenderTexture( TempWidth, TempHeight, TempDepth );
+		}
+		else
+		{
+			if ( ColourLeft == null )		ColourLeft = TempColour;
+			if ( ColourRight == null )		ColourRight = TempColour;
+			if ( ColourForward == null )	ColourForward = TempColour;
+			if ( ColourBackward == null )	ColourBackward = TempColour;
+			if ( ColourUp == null )			ColourUp = TempColour;
+			if ( ColourDown == null )		ColourDown = TempColour;
+		}
+
+		if (MakeDepth)
+		{
+			if ( DepthLeft == null )		DepthLeft = new RenderTexture( TempWidth, TempHeight, 0 );
+			if ( DepthRight == null )		DepthRight = new RenderTexture( TempWidth, TempHeight, 0 );
+			if ( DepthForward == null )		DepthForward = new RenderTexture( TempWidth, TempHeight, 0 );
+			if ( DepthBackward == null )	DepthBackward = new RenderTexture( TempWidth, TempHeight, 0 );
+			if ( DepthUp == null )			DepthUp = new RenderTexture( TempWidth, TempHeight, 0 );
+			if ( DepthDown == null )		DepthDown = new RenderTexture( TempWidth, TempHeight, 0 );
+		}
+
 
 		var TempCameraObject = new GameObject ();
 		//	make a camera
@@ -103,14 +134,14 @@ public class PopDepthCapture360 : MonoBehaviour {
 			Graphics.Blit( null, ColourEquirect, BlitEquirect );
 		}
 
-		Dirty = false;
+		//Dirty = false;
 	}
 
 
 	CommandBuffer GetBlitDepthCommand(RenderTexture DepthTexture)
 	{
 		if ( DepthTexture == null )
-			DepthTexture = new RenderTexture( 1024, 1024, 0, RenderTextureFormat.ARGBFloat );
+			return null;
 
 		//	get command
 		if ( PostBlitDepthCommands == null )
@@ -142,7 +173,10 @@ public class PopDepthCapture360 : MonoBehaviour {
 		cam.targetTexture = ColourTexture;
 
 		cam.RemoveAllCommandBuffers();
-		cam.AddCommandBuffer (BlitDepthAfterEvent, PostBlitCommand);
+		if ( PostBlitCommand != null )
+		{
+			cam.AddCommandBuffer (BlitDepthAfterEvent, PostBlitCommand);
+		}
 		cam.Render ();
 
 	}
