@@ -121,7 +121,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 02b469e38768cd945a7da9e41d46b2ca, type: 2}
+  - {fileID: 2100000, guid: 8930cd47b41a14c4c96c8f558e92cd22, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_ProbeAnchor: {fileID: 0}
@@ -169,6 +169,85 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
+--- !u!1 &221999484
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 221999488}
+  - 33: {fileID: 221999487}
+  - 64: {fileID: 221999486}
+  - 23: {fileID: 221999485}
+  m_Layer: 0
+  m_Name: Plane (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!23 &221999485
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 221999484}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_Materials:
+  - {fileID: 2100000, guid: 02b469e38768cd945a7da9e41d46b2ca, type: 2}
+  m_SubsetIndices: 
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 1
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_SelectedWireframeHidden: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+--- !u!64 &221999486
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 221999484}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Convex: 0
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!33 &221999487
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 221999484}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &221999488
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 221999484}
+  m_LocalRotation: {x: 0.23055907, y: 0.6984906, z: -0.6477621, w: 0.19838788}
+  m_LocalPosition: {x: -19.23, y: 2.1091835, z: -6.86}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 85.11, y: 194.402, z: 49.807003}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
 --- !u!1 &775209934
 GameObject:
   m_ObjectHideFlags: 0
@@ -419,6 +498,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SourceCamera: {fileID: 1064858057}
+  ColourEquirect: {fileID: 8400000, guid: 9b5afe85a3b0b46dfaa4c47666ebdd39, type: 2}
   DepthEquirect: {fileID: 8400000, guid: 0b08b9a18354448bc8e02551f3899604, type: 2}
   DepthShader: {fileID: 4800000, guid: 9d63f46b5387b4f9f866634d7fc6c40c, type: 3}
   BlitDepth: {fileID: 2100000, guid: 2535ef9eea8c84f13a6c640c66d2842b, type: 2}
@@ -429,9 +509,14 @@ MonoBehaviour:
   DepthBackward: {fileID: 8400000, guid: f91be37848b71f94c9e27afea69c5e60, type: 2}
   DepthUp: {fileID: 8400000, guid: 3359b6c61df12234daf5d942d93be11e, type: 2}
   DepthDown: {fileID: 8400000, guid: 32c0a7dc024df97438b612192900845c, type: 2}
+  ColourLeft: {fileID: 8400000, guid: 6d9a84e4a9d800b4e963b12e5ca97e08, type: 2}
+  ColourRight: {fileID: 8400000, guid: 8677a3872ece3aa4aa0f0b4b8491ff41, type: 2}
+  ColourForward: {fileID: 8400000, guid: 459399020d6b78f45b99b506a3cce01b, type: 2}
+  ColourBackward: {fileID: 8400000, guid: 7ad261f02adfb7d42b436e25fa3d4d66, type: 2}
+  ColourUp: {fileID: 8400000, guid: 274703415fc435a46a710a7c4d21528a, type: 2}
+  ColourDown: {fileID: 8400000, guid: 06ced3bae14a81041a8972135ba8fe86, type: 2}
   BlitDepthMax: 12
   BlitDepthMaxUniform: DepthMax
-  TempColour: {fileID: 8400000, guid: 9b5afe85a3b0b46dfaa4c47666ebdd39, type: 2}
   BlitDepthAfterEvent: 1
   Dirty: 1
 --- !u!4 &1025232109

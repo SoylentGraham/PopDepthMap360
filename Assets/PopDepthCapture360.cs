@@ -8,6 +8,8 @@ using System.Collections.Generic;
 public class PopDepthCapture360 : MonoBehaviour {
 
     public Camera			SourceCamera;
+
+	public RenderTexture	ColourEquirect;
 	public RenderTexture	DepthEquirect;
 	public Shader			DepthShader;
 	public Material			BlitDepth;
@@ -20,11 +22,18 @@ public class PopDepthCapture360 : MonoBehaviour {
 	public RenderTexture	DepthUp;
 	public RenderTexture	DepthDown;
 
+	public RenderTexture	ColourLeft;
+	public RenderTexture	ColourRight;
+	public RenderTexture	ColourForward;
+	public RenderTexture	ColourBackward;
+	public RenderTexture	ColourUp;
+	public RenderTexture	ColourDown;
+
 	[Range(0,1000)]
     public float			BlitDepthMax = 100;
     public string			BlitDepthMaxUniform = "DepthMax";
 
-	public RenderTexture	TempColour;
+	RenderTexture			TempColour;
 	public CameraEvent		BlitDepthAfterEvent = CameraEvent.AfterDepthTexture;
 	Dictionary<RenderTexture,UnityEngine.Rendering.CommandBuffer>	PostBlitDepthCommands;
 
@@ -43,6 +52,13 @@ public class PopDepthCapture360 : MonoBehaviour {
 		if ( TempColour == null )
 			TempColour = new RenderTexture(1,1,24);
 		
+		if (ColourLeft ==null)		ColourLeft = TempColour;
+		if (ColourRight ==null)		ColourRight = TempColour;
+		if (ColourForward ==null)	ColourForward = TempColour;
+		if (ColourBackward ==null)	ColourBackward = TempColour;
+		if (ColourUp ==null)		ColourUp = TempColour;
+		if (ColourDown ==null)		ColourDown = TempColour;
+		
 
 		var TempCameraObject = new GameObject ();
 		//	make a camera
@@ -55,24 +71,37 @@ public class PopDepthCapture360 : MonoBehaviour {
 		var RotationUp = SourceCamera.transform.rotation * Quaternion.Euler( -90, 0, 0);
 		var RotationDown = SourceCamera.transform.rotation * Quaternion.Euler( 90, 0, 0);
 		 
-		RenderDepth (TempCamera, RotationLeft, SourceCamera.transform.position, TempColour, ref DepthLeft);
-		RenderDepth (TempCamera, RotationRight, SourceCamera.transform.position, TempColour, ref DepthRight);
-		RenderDepth (TempCamera, RotationForward, SourceCamera.transform.position, TempColour, ref DepthForward);
-		RenderDepth (TempCamera, RotationBackward, SourceCamera.transform.position, TempColour, ref DepthBackward);
-		RenderDepth (TempCamera, RotationUp, SourceCamera.transform.position, TempColour, ref DepthUp);
-		RenderDepth (TempCamera, RotationDown, SourceCamera.transform.position, TempColour, ref DepthDown);
+		RenderDepth (TempCamera, RotationLeft, SourceCamera.transform.position, ColourLeft, ref DepthLeft);
+		RenderDepth (TempCamera, RotationRight, SourceCamera.transform.position, ColourRight, ref DepthRight);
+		RenderDepth (TempCamera, RotationForward, SourceCamera.transform.position, ColourForward, ref DepthForward);
+		RenderDepth (TempCamera, RotationBackward, SourceCamera.transform.position, ColourBackward, ref DepthBackward);
+		RenderDepth (TempCamera, RotationUp, SourceCamera.transform.position, ColourUp, ref DepthUp);
+		RenderDepth (TempCamera, RotationDown, SourceCamera.transform.position, ColourDown, ref DepthDown);
 
 		Destroy (TempCameraObject);
 
 		//	make equirect
-		BlitEquirect.SetTexture("CubemapLeft", DepthLeft);
-		BlitEquirect.SetTexture("CubemapRight", DepthRight);
-		BlitEquirect.SetTexture("CubemapFront", DepthForward);
-		BlitEquirect.SetTexture("CubemapBack", DepthBackward);
-		BlitEquirect.SetTexture("CubemapTop", DepthUp);
-		BlitEquirect.SetTexture("CubemapBottom", DepthDown);
+		if ( DepthEquirect != null )
+		{
+			BlitEquirect.SetTexture("CubemapLeft", DepthLeft);
+			BlitEquirect.SetTexture("CubemapRight", DepthRight);
+			BlitEquirect.SetTexture("CubemapFront", DepthForward);
+			BlitEquirect.SetTexture("CubemapBack", DepthBackward);
+			BlitEquirect.SetTexture("CubemapTop", DepthUp);
+			BlitEquirect.SetTexture("CubemapBottom", DepthDown);
+			Graphics.Blit( null, DepthEquirect, BlitEquirect );
+		}
 
-		Graphics.Blit( null, DepthEquirect, BlitEquirect );
+		if ( ColourEquirect != null )
+		{
+			BlitEquirect.SetTexture("CubemapLeft", ColourLeft);
+			BlitEquirect.SetTexture("CubemapRight", ColourRight);
+			BlitEquirect.SetTexture("CubemapFront", ColourForward);
+			BlitEquirect.SetTexture("CubemapBack", ColourBackward);
+			BlitEquirect.SetTexture("CubemapTop", ColourUp);
+			BlitEquirect.SetTexture("CubemapBottom", ColourDown);
+			Graphics.Blit( null, ColourEquirect, BlitEquirect );
+		}
 
 		Dirty = false;
 	}
