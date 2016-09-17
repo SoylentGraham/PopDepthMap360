@@ -11,9 +11,10 @@ public class PopDepthCapture360 : MonoBehaviour {
 
 	public RenderTexture	ColourEquirect;
 	public RenderTexture	DepthEquirect;
-	public Shader			DepthShader;
-	public Material			BlitDepth;
-	public Material			BlitEquirect;
+	public Shader			BlitDepth;
+	public Shader			BlitEquirect;
+	Material				BlitDepthMaterial;
+	Material				BlitEquirectMaterial;
 
 	public RenderTexture	DepthLeft;
 	public RenderTexture	DepthRight;
@@ -60,9 +61,14 @@ public class PopDepthCapture360 : MonoBehaviour {
 		if ( TempColour == null )
 			TempColour = new RenderTexture(TempWidth,TempHeight,TempDepth);
 		
+		if ( BlitDepthMaterial == null )
+			BlitDepthMaterial = new Material( BlitDepth );
+		if ( BlitEquirectMaterial == null )
+			BlitEquirectMaterial = new Material( BlitEquirect );
+
+
 		if (MakeColour)
 		{
-			
 			if ( ColourLeft == null )		ColourLeft = new RenderTexture( TempWidth, TempHeight, TempDepth );
 			if ( ColourRight == null )		ColourRight = new RenderTexture( TempWidth, TempHeight, TempDepth );
 			if ( ColourForward == null )	ColourForward = new RenderTexture( TempWidth, TempHeight, TempDepth );
@@ -114,24 +120,24 @@ public class PopDepthCapture360 : MonoBehaviour {
 		//	make equirect
 		if ( DepthEquirect != null )
 		{
-			BlitEquirect.SetTexture("CubemapLeft", DepthLeft);
-			BlitEquirect.SetTexture("CubemapRight", DepthRight);
-			BlitEquirect.SetTexture("CubemapFront", DepthForward);
-			BlitEquirect.SetTexture("CubemapBack", DepthBackward);
-			BlitEquirect.SetTexture("CubemapTop", DepthUp);
-			BlitEquirect.SetTexture("CubemapBottom", DepthDown);
-			Graphics.Blit( null, DepthEquirect, BlitEquirect );
+			BlitEquirectMaterial.SetTexture("CubemapLeft", DepthLeft);
+			BlitEquirectMaterial.SetTexture("CubemapRight", DepthRight);
+			BlitEquirectMaterial.SetTexture("CubemapFront", DepthForward);
+			BlitEquirectMaterial.SetTexture("CubemapBack", DepthBackward);
+			BlitEquirectMaterial.SetTexture("CubemapTop", DepthUp);
+			BlitEquirectMaterial.SetTexture("CubemapBottom", DepthDown);
+			Graphics.Blit( null, DepthEquirect, BlitEquirectMaterial );
 		}
 
 		if ( ColourEquirect != null )
 		{
-			BlitEquirect.SetTexture("CubemapLeft", ColourLeft);
-			BlitEquirect.SetTexture("CubemapRight", ColourRight);
-			BlitEquirect.SetTexture("CubemapFront", ColourForward);
-			BlitEquirect.SetTexture("CubemapBack", ColourBackward);
-			BlitEquirect.SetTexture("CubemapTop", ColourUp);
-			BlitEquirect.SetTexture("CubemapBottom", ColourDown);
-			Graphics.Blit( null, ColourEquirect, BlitEquirect );
+			BlitEquirectMaterial.SetTexture("CubemapLeft", ColourLeft);
+			BlitEquirectMaterial.SetTexture("CubemapRight", ColourRight);
+			BlitEquirectMaterial.SetTexture("CubemapFront", ColourForward);
+			BlitEquirectMaterial.SetTexture("CubemapBack", ColourBackward);
+			BlitEquirectMaterial.SetTexture("CubemapTop", ColourUp);
+			BlitEquirectMaterial.SetTexture("CubemapBottom", ColourDown);
+			Graphics.Blit( null, ColourEquirect, BlitEquirectMaterial );
 		}
 
 		//Dirty = false;
@@ -152,7 +158,7 @@ public class PopDepthCapture360 : MonoBehaviour {
 			var PostBlitDepthCommand = new CommandBuffer ();
 			var Id = new RenderTargetIdentifier (DepthTexture);
 			//int depthID = Shader.PropertyToID("_DepthCopyTexture"); 
-			PostBlitDepthCommand.Blit(BuiltinRenderTextureType.CurrentActive, Id, BlitDepth);
+			PostBlitDepthCommand.Blit(BuiltinRenderTextureType.CurrentActive, Id, BlitDepthMaterial);
 			//cmd.SetGlobalTexture("_DepthBuffer", depthID);
 			PostBlitDepthCommands.Add( DepthTexture, PostBlitDepthCommand );
 		}
@@ -175,6 +181,7 @@ public class PopDepthCapture360 : MonoBehaviour {
 		cam.RemoveAllCommandBuffers();
 		if ( PostBlitCommand != null )
 		{
+			BlitDepthMaterial.SetFloat(BlitDepthMaxUniform,BlitDepthMax);
 			cam.AddCommandBuffer (BlitDepthAfterEvent, PostBlitCommand);
 		}
 		cam.Render ();

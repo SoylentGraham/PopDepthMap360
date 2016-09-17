@@ -500,9 +500,8 @@ MonoBehaviour:
   SourceCamera: {fileID: 1064858057}
   ColourEquirect: {fileID: 8400000, guid: 9b5afe85a3b0b46dfaa4c47666ebdd39, type: 2}
   DepthEquirect: {fileID: 8400000, guid: 0b08b9a18354448bc8e02551f3899604, type: 2}
-  DepthShader: {fileID: 4800000, guid: 9d63f46b5387b4f9f866634d7fc6c40c, type: 3}
-  BlitDepth: {fileID: 2100000, guid: 2535ef9eea8c84f13a6c640c66d2842b, type: 2}
-  BlitEquirect: {fileID: 2100000, guid: 75e500349ac3e0f4596d40b3af25f98f, type: 2}
+  BlitDepth: {fileID: 4800000, guid: ede529521e41c4dbaa6c9bbd21a03122, type: 3}
+  BlitEquirect: {fileID: 4800000, guid: ed87349fd60657a46b01d4d0fab30355, type: 3}
   DepthLeft: {fileID: 8400000, guid: 59dd125bc99dec44495b5a3c3adc1a06, type: 2}
   DepthRight: {fileID: 8400000, guid: 7cbbd765ee1b52a4a8843c35984359ee, type: 2}
   DepthForward: {fileID: 8400000, guid: f068e1dbaf0818745994401c4d097742, type: 2}

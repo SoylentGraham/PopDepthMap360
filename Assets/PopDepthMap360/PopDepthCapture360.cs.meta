@@ -1,0 +1,29 @@
+fileFormatVersion: 2
+guid: 1f1098a872f584b2eb9897093a4278b8
+timeCreated: 1474153125
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - SourceCamera: {instanceID: 0}
+  - ColourEquirect: {instanceID: 0}
+  - DepthEquirect: {instanceID: 0}
+  - BlitDepth: {fileID: 4800000, guid: ede529521e41c4dbaa6c9bbd21a03122, type: 3}
+  - BlitEquirect: {fileID: 4800000, guid: ed87349fd60657a46b01d4d0fab30355, type: 3}
+  - DepthLeft: {instanceID: 0}
+  - DepthRight: {instanceID: 0}
+  - DepthForward: {instanceID: 0}
+  - DepthBackward: {instanceID: 0}
+  - DepthUp: {instanceID: 0}
+  - DepthDown: {instanceID: 0}
+  - ColourLeft: {instanceID: 0}
+  - ColourRight: {instanceID: 0}
+  - ColourForward: {instanceID: 0}
+  - ColourBackward: {instanceID: 0}
+  - ColourUp: {instanceID: 0}
+  - ColourDown: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
