@@ -497,7 +497,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f1098a872f584b2eb9897093a4278b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SourceCamera: {fileID: 1064858057}
+  SourceCamera: {fileID: 1064858061}
   ColourEquirect: {fileID: 8400000, guid: 9b5afe85a3b0b46dfaa4c47666ebdd39, type: 2}
   DepthEquirect: {fileID: 8400000, guid: 0b08b9a18354448bc8e02551f3899604, type: 2}
   BlitDepth: {fileID: 4800000, guid: ede529521e41c4dbaa6c9bbd21a03122, type: 3}

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 public class PopDepthCapture360 : MonoBehaviour {
 
-    public Camera			SourceCamera;
+    public Transform		SourceCamera;
 
 	public RenderTexture	ColourEquirect;
 	public RenderTexture	DepthEquirect;
@@ -45,11 +45,19 @@ public class PopDepthCapture360 : MonoBehaviour {
 		Dirty = true;
 	}
 
+	
 	void Update ()
 	{
 		if ( !Dirty )
 			return;
 
+		Render();
+
+		Dirty = false;
+	}
+
+	public void Render (System.Action<Material> OnPreBlit=null)
+	{
 		bool MakeDepth = ( DepthEquirect != null );
 		bool MakeColour = ( ColourEquirect != null );
 
@@ -126,6 +134,9 @@ public class PopDepthCapture360 : MonoBehaviour {
 			BlitEquirectMaterial.SetTexture("CubemapBack", DepthBackward);
 			BlitEquirectMaterial.SetTexture("CubemapTop", DepthUp);
 			BlitEquirectMaterial.SetTexture("CubemapBottom", DepthDown);
+
+			if ( OnPreBlit != null )
+				OnPreBlit.Invoke( BlitEquirectMaterial );
 			Graphics.Blit( null, DepthEquirect, BlitEquirectMaterial );
 		}
 
@@ -137,10 +148,11 @@ public class PopDepthCapture360 : MonoBehaviour {
 			BlitEquirectMaterial.SetTexture("CubemapBack", ColourBackward);
 			BlitEquirectMaterial.SetTexture("CubemapTop", ColourUp);
 			BlitEquirectMaterial.SetTexture("CubemapBottom", ColourDown);
+
+			if ( OnPreBlit != null )
+				OnPreBlit.Invoke( BlitEquirectMaterial );
 			Graphics.Blit( null, ColourEquirect, BlitEquirectMaterial );
 		}
-
-		//Dirty = false;
 	}
 
 
