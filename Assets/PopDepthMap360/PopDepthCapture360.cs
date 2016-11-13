@@ -7,7 +7,14 @@ using System.Collections.Generic;
 
 public class PopDepthCapture360 : MonoBehaviour {
 
+	[Header("Sometimes depth is backwards on left & right. But not always. Not sure what the problem is, colour is usually fine...")]
+	public bool				SwapDepthLeftRight = false;
+
     public Transform		SourceCamera;
+	[Range(-180,180)]
+	public float			YawOffset = 0;
+	public int				MaxOutputWidth = 2048;
+	public int				MaxOutputHeight = 2048;
 
 	public RenderTexture	ColourEquirect;
 	public RenderTexture	DepthEquirect;
@@ -58,12 +65,21 @@ public class PopDepthCapture360 : MonoBehaviour {
 
 	public void Render (System.Action<Material> OnPreBlit=null)
 	{
+		//	reset caches. VERY IMPORTANT ON OSX (opengl?) caching materials when editing reloads nothing. presumably material caches shader blob
+		if (Application.isEditor) {
+			BlitDepthMaterial = null;
+			BlitEquirectMaterial = null;
+			PostBlitDepthCommands = null;
+		}
+
 		bool MakeDepth = ( DepthEquirect != null );
 		bool MakeColour = ( ColourEquirect != null );
 
 		//	gr: this affects depth capture
 		int TempWidth = Mathf.Max( ColourEquirect ? ColourEquirect.width : 1, DepthEquirect ? DepthEquirect.width : 1 );
 		int TempHeight = Mathf.Max( ColourEquirect ? ColourEquirect.height : 1, DepthEquirect ? DepthEquirect.height : 1 );
+		TempWidth = Mathf.Min( MaxOutputWidth, TempWidth );
+		TempHeight = Mathf.Min( MaxOutputHeight, TempHeight );
 		int TempDepth = 24;
 
 		if ( TempColour == null )
@@ -106,16 +122,17 @@ public class PopDepthCapture360 : MonoBehaviour {
 
 
 		var TempCameraObject = new GameObject ();
+		TempCameraObject.SetActive(false);
 		//	make a camera
 		var TempCamera = TempCameraObject.AddComponent<Camera>();
 		
-		var RotationLeft = SourceCamera.transform.rotation * Quaternion.Euler( 0, -90, 0);
-		var RotationRight = SourceCamera.transform.rotation * Quaternion.Euler( 0, 90, 0);
-		var RotationForward = SourceCamera.transform.rotation * Quaternion.Euler( 0, 0, 0);
-		var RotationBackward = SourceCamera.transform.rotation * Quaternion.Euler( 0, 180, 0);
-		var RotationUp = SourceCamera.transform.rotation * Quaternion.Euler( -90, 0, 0);
-		var RotationDown = SourceCamera.transform.rotation * Quaternion.Euler( 90, 0, 0);
-		 
+		var RotationLeft = SourceCamera.transform.rotation * Quaternion.Euler( 0, YawOffset, 0) * Quaternion.Euler( 0, -90, 0);
+		var RotationRight = SourceCamera.transform.rotation * Quaternion.Euler( 0, YawOffset, 0) * Quaternion.Euler( 0, 90, 0);
+		var RotationForward = SourceCamera.transform.rotation * Quaternion.Euler( 0, YawOffset, 0) * Quaternion.Euler( 0, 0, 0);
+		var RotationBackward = SourceCamera.transform.rotation * Quaternion.Euler( 0, YawOffset, 0) * Quaternion.Euler( 0, 180, 0);
+		var RotationUp = SourceCamera.transform.rotation * Quaternion.Euler( 0, YawOffset, 0) * Quaternion.Euler( -90, 0, 0);
+		var RotationDown = SourceCamera.transform.rotation * Quaternion.Euler( 0, YawOffset, 0) * Quaternion.Euler( 90, 0, 0);
+		
 		RenderDepth (TempCamera, RotationLeft, SourceCamera.transform.position, ColourLeft, ref DepthLeft);
 		RenderDepth (TempCamera, RotationRight, SourceCamera.transform.position, ColourRight, ref DepthRight);
 		RenderDepth (TempCamera, RotationForward, SourceCamera.transform.position, ColourForward, ref DepthForward);
@@ -123,13 +140,16 @@ public class PopDepthCapture360 : MonoBehaviour {
 		RenderDepth (TempCamera, RotationUp, SourceCamera.transform.position, ColourUp, ref DepthUp);
 		RenderDepth (TempCamera, RotationDown, SourceCamera.transform.position, ColourDown, ref DepthDown);
 
-		Destroy (TempCameraObject);
+		if ( Application.isEditor && !Application.isPlaying )
+			DestroyImmediate (TempCameraObject);
+		else
+			Destroy (TempCameraObject);
 
 		//	make equirect
 		if ( DepthEquirect != null )
 		{
-			BlitEquirectMaterial.SetTexture("CubemapLeft", DepthLeft);
-			BlitEquirectMaterial.SetTexture("CubemapRight", DepthRight);
+			BlitEquirectMaterial.SetTexture("CubemapLeft", SwapDepthLeftRight ? DepthRight : DepthLeft );
+			BlitEquirectMaterial.SetTexture("CubemapRight", SwapDepthLeftRight ? DepthLeft : DepthRight  );
 			BlitEquirectMaterial.SetTexture("CubemapFront", DepthForward);
 			BlitEquirectMaterial.SetTexture("CubemapBack", DepthBackward);
 			BlitEquirectMaterial.SetTexture("CubemapTop", DepthUp);
@@ -180,20 +200,34 @@ public class PopDepthCapture360 : MonoBehaviour {
 
 	void RenderDepth(Camera TempCamera,Quaternion Rotation,Vector3 Position,RenderTexture ColourTexture,ref RenderTexture DepthTexture)
 	{
-		var PostBlitCommand = GetBlitDepthCommand( DepthTexture );
 		var cam = TempCamera;
-		
+
+		if ( DepthTexture != null )
+		{
+			DepthTexture.DiscardContents();
+			Graphics.Blit( Texture2D.blackTexture, DepthTexture );
+		}
+
 		cam.transform.position = Position;
 		cam.transform.rotation = Rotation;
 		cam.depthTextureMode = DepthTextureMode.Depth;
+		cam.nearClipPlane = 0.00001f;
 		cam.farClipPlane = BlitDepthMax;
 		cam.fieldOfView = 90;
 		cam.targetTexture = ColourTexture;
 
 		cam.RemoveAllCommandBuffers();
+
+		BlitDepthMaterial.SetFloat(BlitDepthMaxUniform,BlitDepthMax);
+		Matrix4x4 ScreenToViewMtx = cam.projectionMatrix.inverse;
+		BlitDepthMaterial.SetVector ("ScreenToViewMtx_Row0", ScreenToViewMtx.GetRow (0));
+		BlitDepthMaterial.SetVector ("ScreenToViewMtx_Row1", ScreenToViewMtx.GetRow (1));
+		BlitDepthMaterial.SetVector ("ScreenToViewMtx_Row2", ScreenToViewMtx.GetRow (2));
+		BlitDepthMaterial.SetVector ("ScreenToViewMtx_Row3", ScreenToViewMtx.GetRow (3));
+
+		var PostBlitCommand = GetBlitDepthCommand( DepthTexture );
 		if ( PostBlitCommand != null )
 		{
-			BlitDepthMaterial.SetFloat(BlitDepthMaxUniform,BlitDepthMax);
 			cam.AddCommandBuffer (BlitDepthAfterEvent, PostBlitCommand);
 		}
 		cam.Render ();
