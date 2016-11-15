@@ -2,7 +2,9 @@
 using System.Collections;
 using UnityEngine.Rendering;
 using System.Collections.Generic;
-
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 
 public class PopDepthCapture360 : MonoBehaviour {
@@ -132,46 +134,82 @@ public class PopDepthCapture360 : MonoBehaviour {
 		var RotationBackward = SourceCamera.transform.rotation * Quaternion.Euler( 0, YawOffset, 0) * Quaternion.Euler( 0, 180, 0);
 		var RotationUp = SourceCamera.transform.rotation * Quaternion.Euler( 0, YawOffset, 0) * Quaternion.Euler( -90, 0, 0);
 		var RotationDown = SourceCamera.transform.rotation * Quaternion.Euler( 0, YawOffset, 0) * Quaternion.Euler( 90, 0, 0);
-		
-		RenderDepth (TempCamera, RotationLeft, SourceCamera.transform.position, ColourLeft, ref DepthLeft);
-		RenderDepth (TempCamera, RotationRight, SourceCamera.transform.position, ColourRight, ref DepthRight);
-		RenderDepth (TempCamera, RotationForward, SourceCamera.transform.position, ColourForward, ref DepthForward);
-		RenderDepth (TempCamera, RotationBackward, SourceCamera.transform.position, ColourBackward, ref DepthBackward);
-		RenderDepth (TempCamera, RotationUp, SourceCamera.transform.position, ColourUp, ref DepthUp);
-		RenderDepth (TempCamera, RotationDown, SourceCamera.transform.position, ColourDown, ref DepthDown);
 
-		if ( Application.isEditor && !Application.isPlaying )
-			DestroyImmediate (TempCameraObject);
-		else
-			Destroy (TempCameraObject);
+		var ProgressBarTitle = "Rendering depth 360";
+		var Step = 0;
+		var StepCount = 6 + 1 + 1;
+		System.Action<string> UpdateProgressBar = (string StepDescription) => {
+			if ( EditorUtility.DisplayCancelableProgressBar( ProgressBarTitle, StepDescription, Step / (float)StepCount ) )
+			{
+				throw new System.Exception( ProgressBarTitle + " cancelled");
+			}
+			Step++;
+		};
 
-		//	make equirect
-		if ( DepthEquirect != null )
+		try
 		{
-			BlitEquirectMaterial.SetTexture("CubemapLeft", SwapDepthLeftRight ? DepthRight : DepthLeft );
-			BlitEquirectMaterial.SetTexture("CubemapRight", SwapDepthLeftRight ? DepthLeft : DepthRight  );
-			BlitEquirectMaterial.SetTexture("CubemapFront", DepthForward);
-			BlitEquirectMaterial.SetTexture("CubemapBack", DepthBackward);
-			BlitEquirectMaterial.SetTexture("CubemapTop", DepthUp);
-			BlitEquirectMaterial.SetTexture("CubemapBottom", DepthDown);
+			UpdateProgressBar("Rendering Left");
+			RenderDepth (TempCamera, RotationLeft, SourceCamera.transform.position, ColourLeft, ref DepthLeft);
+			UpdateProgressBar("Rendering Right");
+			RenderDepth (TempCamera, RotationRight, SourceCamera.transform.position, ColourRight, ref DepthRight);
+			UpdateProgressBar("Rendering Forward");
+			RenderDepth (TempCamera, RotationForward, SourceCamera.transform.position, ColourForward, ref DepthForward);
+			UpdateProgressBar("Rendering Backward");
+			RenderDepth (TempCamera, RotationBackward, SourceCamera.transform.position, ColourBackward, ref DepthBackward);
+			UpdateProgressBar("Rendering Up");
+			RenderDepth (TempCamera, RotationUp, SourceCamera.transform.position, ColourUp, ref DepthUp);
+			UpdateProgressBar("Rendering Down");
+			RenderDepth (TempCamera, RotationDown, SourceCamera.transform.position, ColourDown, ref DepthDown);
 
-			if ( OnPreBlit != null )
-				OnPreBlit.Invoke( BlitEquirectMaterial );
-			Graphics.Blit( null, DepthEquirect, BlitEquirectMaterial );
+			if ( Application.isEditor && !Application.isPlaying )
+				DestroyImmediate (TempCameraObject);
+			else
+				Destroy (TempCameraObject);
+
+			//	make equirect
+			if ( DepthEquirect != null )
+			{
+				UpdateProgressBar("Generating depth equirect");
+				BlitEquirectMaterial.SetTexture("CubemapLeft", SwapDepthLeftRight ? DepthRight : DepthLeft );
+				BlitEquirectMaterial.SetTexture("CubemapRight", SwapDepthLeftRight ? DepthLeft : DepthRight  );
+				BlitEquirectMaterial.SetTexture("CubemapFront", DepthForward);
+				BlitEquirectMaterial.SetTexture("CubemapBack", DepthBackward);
+				BlitEquirectMaterial.SetTexture("CubemapTop", DepthUp);
+				BlitEquirectMaterial.SetTexture("CubemapBottom", DepthDown);
+
+				if ( OnPreBlit != null )
+					OnPreBlit.Invoke( BlitEquirectMaterial );
+				Graphics.Blit( null, DepthEquirect, BlitEquirectMaterial );
+			}
+			else
+			{
+				UpdateProgressBar("Generating depth equirect [skipped]");
+			}
+
+			if ( ColourEquirect != null )
+			{
+				UpdateProgressBar("Generating colour equirect [skipped]");
+				BlitEquirectMaterial.SetTexture("CubemapLeft", ColourLeft);
+				BlitEquirectMaterial.SetTexture("CubemapRight", ColourRight);
+				BlitEquirectMaterial.SetTexture("CubemapFront", ColourForward);
+				BlitEquirectMaterial.SetTexture("CubemapBack", ColourBackward);
+				BlitEquirectMaterial.SetTexture("CubemapTop", ColourUp);
+				BlitEquirectMaterial.SetTexture("CubemapBottom", ColourDown);
+
+				if ( OnPreBlit != null )
+					OnPreBlit.Invoke( BlitEquirectMaterial );
+				Graphics.Blit( null, ColourEquirect, BlitEquirectMaterial );
+			}
+			else
+			{
+				UpdateProgressBar("Generating colour equirect [skipped]");
+			}
+			EditorUtility.ClearProgressBar();
 		}
-
-		if ( ColourEquirect != null )
+		catch
 		{
-			BlitEquirectMaterial.SetTexture("CubemapLeft", ColourLeft);
-			BlitEquirectMaterial.SetTexture("CubemapRight", ColourRight);
-			BlitEquirectMaterial.SetTexture("CubemapFront", ColourForward);
-			BlitEquirectMaterial.SetTexture("CubemapBack", ColourBackward);
-			BlitEquirectMaterial.SetTexture("CubemapTop", ColourUp);
-			BlitEquirectMaterial.SetTexture("CubemapBottom", ColourDown);
-
-			if ( OnPreBlit != null )
-				OnPreBlit.Invoke( BlitEquirectMaterial );
-			Graphics.Blit( null, ColourEquirect, BlitEquirectMaterial );
+			EditorUtility.ClearProgressBar();
+			throw;
 		}
 	}
 
